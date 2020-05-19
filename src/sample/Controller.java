@@ -16,7 +16,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import mesh.*;
 import mesh.Point;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
