@@ -58,6 +58,39 @@ public class Controller implements Serializable {
     ColorReader c=new ColorReader();
 
     public void clickColors(ActionEvent event) throws IOException {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("CHOOSE YOUR FIGHTER");
+        alert.setHeaderText(":)");
+        alert.setContentText("Choose your option.");
+
+        ButtonType buttonTypeOne = new ButtonType("MESH ALL");
+        ButtonType buttonTypeTwo = new ButtonType("MESH CHOSEN COLOR");
+
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeOne) {
+            colors1();
+        } else if (result.get() == buttonTypeTwo) {
+            colors2();
+        }
+    }
+
+    public void colors1() throws IOException {
+        drawAndBuild();
+        q.buildTreeCMeshAll();
+        drawSplitColorMeshAll(d.rootNode);
+        saveAsPng();
+    }
+
+    public void colors2() throws IOException {
+        drawAndBuild();
+        q.buildTreeC();
+        drawSplitColor(d.rootNode);
+        saveAsPng();
+    }
+
+    private void drawAndBuild() throws IOException {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         File bmpFile = new File("image.bmp");
         c.bf = ImageIO.read(bmpFile);
@@ -67,9 +100,6 @@ public class Controller implements Serializable {
         ArrayList<PixelObject> arr = PixelObject.output(ColorReader.colors(c.bf), c.bf.getWidth(), c.bf.getHeight());
         System.out.println(arr.size());
         d.pic=c.bf;
-        q.buildTreeC();
-        drawSplitColor(d.rootNode);
-        saveAsPng();
     }
 
 
@@ -106,6 +136,7 @@ public class Controller implements Serializable {
         mesh.generateMesh();
         draw();
     }
+
 
     public void tryTrapeze(ActionEvent event){
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -173,9 +204,7 @@ public class Controller implements Serializable {
     }
 
     void drawSplitColor(Node root){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(Color.WHITE);
-        gc.strokeRect(root.p.origin.x, root.p.origin.y, root.p.width, root.p.height);
+        getGC(root);
         if(root.n1 != null && (q.checkk(root.n1.p)))
             drawSplitColor(root.n1);
         if(root.n2 != null && (q.checkk(root.n2.p)))
@@ -186,12 +215,35 @@ public class Controller implements Serializable {
             drawSplitColor(root.n4);
     }
 
+    void drawSplitColorMeshAll(Node root) {
+        getGC(root);
+        if (root.n1 != null && (q.checkMeshAll(root.n1.p)))
+            drawSplitColorMeshAll(root.n1);
+        if (root.n2 != null && (q.checkMeshAll(root.n2.p)))
+            drawSplitColorMeshAll(root.n2);
+        if (root.n3 != null && (q.checkMeshAll(root.n3.p)))
+            drawSplitColorMeshAll(root.n3);
+        if (root.n4 != null && (q.checkMeshAll(root.n4.p)))
+            drawSplitColorMeshAll(root.n4);
+    }
+
+    private void getGC(Node root) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setStroke(Color.WHITE);
+        gc.setLineWidth(0.5);
+        strokeRect(root, gc);
+    }
+
+    private void strokeRect(Node root, GraphicsContext gc) {
+        gc.strokeRect(root.p.origin.x, root.p.origin.y, root.p.width, root.p.height);
+        gc.strokeLine(root.p.origin.x, root.p.origin.y, root.p.origin.x + root.p.width, root.p.origin.y + root.p.height);
+    }
+
     void drawSplitT(Node root){
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setStroke(Color.HOTPINK);
         if((q.check(root.p).equals("mixed") || (q.check(root.p).equals("black"))))  {
-            gc.strokeRect(root.p.origin.x, root.p.origin.y, root.p.width, root.p.height);
-            gc.strokeLine(root.p.origin.x, root.p.origin.y, root.p.origin.x + root.p.width, root.p.origin.y + root.p.height);
+            strokeRect(root, gc);
         }
         if(root.n1 != null)
             drawSplitT(root.n1);
@@ -290,27 +342,61 @@ public class Controller implements Serializable {
     }
 
     public void clickImport(ActionEvent event) throws IOException, ClassNotFoundException {
-        try {
-            d.elements=new ArrayList<>();
-            FileInputStream fis = new FileInputStream("meshes.csv");
-            ObjectInputStream in = new ObjectInputStream(fis);
-            d.elements = (ArrayList<Element>) in.readObject();
-            fis.close();
-            in.close();
-            d.points=new ArrayList<>();
-            FileInputStream fis1 = new FileInputStream("points.csv");
-            ObjectInputStream in1 = new ObjectInputStream(fis1);
-            d.points = (ArrayList<Point>) in1.readObject();
-            fis1.close();
-            in1.close();
-            GraphicsContext gc = canvas.getGraphicsContext2D();
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            draw();
-        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("IMPORT");
+        alert.setHeaderText(":)");
+        alert.setContentText("What do you want to import.");
 
-        catch (IOException I) {
-            System.out.println("ERROR");
+        ButtonType buttonTypeOne = new ButtonType("simple meshes");
+        ButtonType buttonTypeTwo = new ButtonType("png");
 
+        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeOne) {
+            try {
+                d.elements=new ArrayList<>();
+                FileInputStream fis = new FileInputStream("meshes.csv");
+                ObjectInputStream in = new ObjectInputStream(fis);
+                d.elements = (ArrayList<Element>) in.readObject();
+                fis.close();
+                in.close();
+                d.points=new ArrayList<>();
+                FileInputStream fis1 = new FileInputStream("points.csv");
+                ObjectInputStream in1 = new ObjectInputStream(fis1);
+                d.points = (ArrayList<Point>) in1.readObject();
+                fis1.close();
+                in1.close();
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                draw();
+            }
+
+            catch (IOException I) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Error Dialog");
+                a.setHeaderText("Look, an Error Dialog");
+                a.setContentText("CANNOT IMPORT - ERROR LOADING FILE");
+
+                a.showAndWait();
+
+            }
+        } else if (result.get() == buttonTypeTwo) {
+            try {
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+                c.bf = ImageIO.read(new File("blagam.png"));
+                convertToFxImage(c.bf);
+                gc.drawImage(convertToFxImage(c.bf), 0 , 0);
+            }
+            catch (IOException I) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Error Dialog");
+                a.setHeaderText("Look, an Error Dialog");
+                a.setContentText("CANNOT IMPORT - ERROR LOADING FILE");
+
+                a.showAndWait();
+
+            }
         }
     }
 

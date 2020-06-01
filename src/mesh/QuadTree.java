@@ -25,8 +25,28 @@ public class QuadTree {
                 }
             }
         }
-        return check > 0;
+        return (check>0);
     }
+
+    public boolean checkMeshAll(Part p) {
+        /*int check=0;
+        int check2=2;
+        PixelObject[][] arr = new PixelObject[d.pic.getWidth()][d.pic.getHeight()];
+        for (int i = p.origin.x; i < (p.origin.x + p.width); i++) {
+            for (int j = p.origin.y; j < (p.origin.y + p.height); j++) {
+                //Color current = new Color(d.pic.getRGB(i, j));
+                arr[i][j] = new PixelObject(i, j, d.pic.getRGB(i, j));
+                if(arr[i][j].identifier == 8320877){
+                    check++;
+                }
+                else{
+                    check2++;
+                }
+            }
+        }*/
+        return true;
+    }
+
 
     public String check(Part p) {
 
@@ -92,6 +112,41 @@ public class QuadTree {
                     splitColor(n3);
                 if (checkk(n4.p))
                     splitColor(n4);
+            }
+        }
+    }
+
+    void splitColorMeshAll(Node root) {
+        if (checkMeshAll(root.p)) {
+            if (root.p.width % 2 != 0) {
+                root.p.width = root.p.width - 1;
+            }
+            if (root.p.height % 2 != 0) {
+                root.p.height = root.p.height - 1;
+            }
+            int width = root.p.width / 2;
+            int height = root.p.height / 2;
+            if (width > d.tolerance && height > d.tolerance) {
+                Node n1 = new Node(new Part(new Point(root.p.origin.x, root.p.origin.y), width, height), null, null, null, null);
+                Node n2 = new Node(new Part(new Point(root.p.origin.x + width, root.p.origin.y), width, height), null, null, null, null);
+                Node n3 = new Node(new Part(new Point(root.p.origin.x, root.p.origin.y + height), width, height), null, null, null, null);
+                Node n4 = new Node(new Part(new Point(root.p.origin.x + width, root.p.origin.y + height), width, height), null, null, null, null);
+                root.n1 = n1;
+                root.n2 = n2;
+                root.n3 = n3;
+                root.n4 = n4;
+                splitColorMeshAll(n1);
+                splitColorMeshAll(n2);
+                splitColorMeshAll(n3);
+                splitColorMeshAll(n4);
+                if (checkMeshAll(n1.p))
+                    splitColorMeshAll(n1);
+                if (checkMeshAll(n2.p))
+                    splitColorMeshAll(n2);
+                if (checkMeshAll(n3.p))
+                    splitColorMeshAll(n3);
+                if (checkMeshAll(n4.p))
+                    splitColorMeshAll(n4);
             }
         }
     }
@@ -183,6 +238,15 @@ public class QuadTree {
         d.rootNode = new Node(mainPart, null, null, null, null);
         splitColor(d.rootNode);
     }
+
+    public void buildTreeCMeshAll() {
+        int width = d.pic.getWidth();
+        int height = d.pic.getHeight();
+        Part mainPart = new Part(new Point(0, 0), width, height);
+        d.rootNode = new Node(mainPart, null, null, null, null);
+        splitColorMeshAll(d.rootNode);
+    }
+
 
     public void buildTree2() {
         int width = 700;
