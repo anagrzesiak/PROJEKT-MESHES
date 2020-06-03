@@ -1,9 +1,7 @@
 package sample;
 
-import com.sun.javafx.image.BytePixelGetter;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -12,8 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import mesh.*;
 import mesh.Point;
 import javax.imageio.ImageIO;
@@ -52,10 +50,16 @@ public class Controller implements Serializable {
     @FXML
     private Button squareButton;
     @FXML
+    private Button snapshotButton;
+    @FXML
     private Canvas canvas;
 
     QuadTree q = new QuadTree(d);
     ColorReader c=new ColorReader();
+
+    public void setSnapshotButton(ActionEvent event){
+        saveAsPng();
+    }
 
     public void clickColors(ActionEvent event) throws IOException {
         clean();
@@ -189,19 +193,21 @@ public class Controller implements Serializable {
         drawAndBuild();
         q.buildTreeCMeshAll();
         drawSplitColorMeshAll(d.rootNode);
-        saveAsPng();
+        //saveAsPng();
     }
 
     public void colors2(int id) throws IOException {
         drawAndBuild();
         q.buildTreeC(id);
         drawSplitColor(d.rootNode, id);
-        saveAsPng();
+        //saveAsPng();
     }
 
     private Image drawAndBuild() throws IOException {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         File bmpFile = new File("image.bmp");
+        //String path = pathFileChooser();
+        //File bmpFile = new File(path);
         c.bf = ImageIO.read(bmpFile);
         convertToFxImage(c.bf);
         gc.drawImage(convertToFxImage(c.bf), 0 , 0);
@@ -223,6 +229,22 @@ public class Controller implements Serializable {
         }
     }
 
+    public String pathFileChooser(){
+        FileChooser fil_chooser = new FileChooser();
+        File file = fil_chooser.showOpenDialog(null);
+
+        if (file != null) {
+            return file.getAbsolutePath();
+        }
+        else{
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Error Dialog");
+            a.setHeaderText("Look, an Error Dialog");
+            a.setContentText("file does not exist");
+            a.showAndWait();
+            return null;
+        }
+    }
 
 
     public void tryRhomb(ActionEvent event){
@@ -308,6 +330,8 @@ public class Controller implements Serializable {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         add();
         try {
+            //String path = pathFileChooser();
+            //d.pic = ImageIO.read(new File(path));
             d.pic = ImageIO.read(new File("bg.jpg"));
             gc.drawImage(convertToFxImage(d.pic), 0, 0);
             q.buildTree();
