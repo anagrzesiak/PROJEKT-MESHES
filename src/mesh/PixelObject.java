@@ -1,14 +1,10 @@
 package mesh;
 
-import sample.Controller;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class PixelObject {
-    private static final AtomicInteger count = new AtomicInteger(0);
+   //private static final AtomicInteger count = new AtomicInteger(0);
     int color;
     public int x, y;
     public int id;
@@ -29,10 +25,6 @@ public class PixelObject {
                 System.out.println("PIXEL! IDENTIFIER: " + po.id);
             }
         }
-    }
-
-    public ArrayList<PixelObject> getArr() {
-        return (ArrayList<PixelObject>) one;
     }
 
 }

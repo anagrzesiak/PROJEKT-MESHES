@@ -181,13 +181,7 @@ public class Controller implements Serializable {
 
         return id;
     }
-
-    public int getRGB( Color col) {
-        int r = ((int) Color.RED.getRed()*255);
-        int g = ((int) Color.RED.getGreen() * 255);
-        int b = ((int) Color.RED.getBlue() * 255);
-        return (r << 16) + (g << 8) + b;
-    }
+    
 
     public void colors1() throws IOException {
         drawAndBuild();
@@ -388,10 +382,12 @@ public class Controller implements Serializable {
     }
 
     private void getGC(Node root) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(Color.WHITE);
-        gc.setLineWidth(0.5);
-        strokeRect(root, gc);
+        if(root.p.width<10) {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.setStroke(Color.WHITE);
+            gc.setLineWidth(0.5);
+            strokeRect(root, gc);
+        }
     }
 
     private void strokeRect(Node root, GraphicsContext gc) {
@@ -403,6 +399,7 @@ public class Controller implements Serializable {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setStroke(Color.HOTPINK);
         if((q.check(root.p).equals("mixed") || (q.check(root.p).equals("black"))))  {
+            if(root.p.width<25)
             strokeRect(root, gc);
         }
         if(root.n1 != null)
@@ -417,8 +414,10 @@ public class Controller implements Serializable {
 
     void drawSplit(Node root){
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(Color.HOTPINK);
-        gc.strokeRect(root.p.origin.x, root.p.origin.y, root.p.width, root.p.height);
+        if(root.p.width<25) {
+            gc.setStroke(Color.HOTPINK);
+            gc.strokeRect(root.p.origin.x, root.p.origin.y, root.p.width, root.p.height);
+        }
         if(root.n1 != null && (q.check(root.n1.p).equals("mixed") || q.check(root.n1.p).equals("black")))
             drawSplit(root.n1);
         if(root.n2 != null && (q.check(root.n2.p).equals("mixed") || q.check(root.n2.p).equals("black")))
