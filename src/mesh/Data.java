@@ -16,7 +16,7 @@ public class Data implements Serializable {
     public int width=500;
     public int x0=0;
     public int y0=0;
-    public int tolerance=3;
+    public int tolerance=1;
     public int particleSize = 10;
     public BufferedImage pic;
     public Node rootNode;

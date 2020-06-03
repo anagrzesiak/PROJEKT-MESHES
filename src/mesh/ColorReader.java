@@ -3,8 +3,10 @@ package mesh;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ColorReader {
+    private static final AtomicInteger count = new AtomicInteger(0);
     public BufferedImage bf;
     public ColorReader(){
 

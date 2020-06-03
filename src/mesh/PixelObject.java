@@ -5,43 +5,35 @@ import sample.Controller;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PixelObject {
+    private static final AtomicInteger count = new AtomicInteger(0);
     int color;
-    public int x, y, identifier;
+    public int x, y;
+    public int id;
     public static List<PixelObject> one = new ArrayList<PixelObject>();
+    public static List<PixelObject> all = new ArrayList<PixelObject>();
 
-
-    public PixelObject(int x, int y, int color){
-        this.x=x;
-        this.y=y;
-        this.color=color;
-        identifier=-(color)/2;
+    public PixelObject(int x, int y, int color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        id=-(color)/2;
     }
 
-    public static ArrayList<PixelObject> output(PixelObject[][] p, int length, int width){
+    public static void output(PixelObject[][] p, int length, int width) {
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < width; j++) {
                 PixelObject po = p[i][j];
-                if (po.identifier == 6779600) {
-                    one.add(po);
-                    //System.out.println("added");
-                }
-                System.out.println("PIXEL! IDENTIFIER: " +po.identifier);
+                System.out.println("PIXEL! IDENTIFIER: " + po.id);
             }
         }
-        return (ArrayList<PixelObject>) one;
     }
 
-    public ArrayList<PixelObject> getArr(){
+    public ArrayList<PixelObject> getArr() {
         return (ArrayList<PixelObject>) one;
-    }
-
-    public void pack(PixelObject uh){
-        if (uh.identifier == 6779600) {
-            one.add(uh);
-            //System.out.println("added");
-        }
     }
 
 }
+

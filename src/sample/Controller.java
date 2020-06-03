@@ -1,7 +1,9 @@
 package sample;
 
+import com.sun.javafx.image.BytePixelGetter;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -9,10 +11,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
+import javafx.scene.image.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import mesh.*;
 import mesh.Point;
@@ -58,6 +58,7 @@ public class Controller implements Serializable {
     ColorReader c=new ColorReader();
 
     public void clickColors(ActionEvent event) throws IOException {
+        clean();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("CHOOSE YOUR FIGHTER");
         alert.setHeaderText(":)");
@@ -72,8 +73,116 @@ public class Controller implements Serializable {
         if (result.get() == buttonTypeOne) {
             colors1();
         } else if (result.get() == buttonTypeTwo) {
-            colors2();
+            int id=textInput();
+            colors2(id);
         }
+    }
+
+    public int textInput(){
+        int id=1;
+        TextInputDialog dialog = new TextInputDialog("1");
+        dialog.setTitle("Text Input Dialog");
+        dialog.setHeaderText("Look, a Text Input Dialog");
+        dialog.setContentText("Please enter id (1-19):");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            try {
+                if (Integer.parseInt((result.get())) > 0 && Integer.parseInt((result.get())) < 20) {
+                    switch (Integer.parseInt((result.get()))) {
+                        case 1:
+                            id = 6779600;
+                            return id;
+                        case 2:
+                            id = 3404939;
+                            return id;
+                        case 3:
+                            id = 7369238;
+                            return id;
+                        case 4:
+                            id = 1143919;
+                            return id;
+                        case 5:
+                            id = 4158219;
+                            return id;
+                        case 6:
+                            id = 5370067;
+                            return id;
+                        case 7:
+                            id = 2815944;
+                            return id;
+                        case 8:
+                            id = 3665435;
+                            return id;
+                        case 9:
+                            id = 1340650;
+                            return id;
+                        case 10:
+                            id = 2915594;
+                            return id;
+                        case 11:
+                            id = 8320877;
+                            return id;
+                        case 12:
+                            id = 8321183;
+                            return id;
+                        case 13:
+                            id = 96105;
+                            return id;
+                        case 14:
+                            id = 5009485;
+                            return id;
+                        case 15:
+                            id = 1635253;
+                            return id;
+                        case 16:
+                            id = 7927835;
+                            return id;
+                        case 17:
+                            id = 3141128;
+                            return id;
+                        case 18:
+                            id = 6257862;
+                            return id;
+                        case 19:
+                            id = 5174473;
+                            return id;
+                    }
+                } else {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setTitle("Error Dialog");
+                    a.setHeaderText("Look, an Error Dialog");
+                    a.setContentText("WRONG INPUT");
+                    a.showAndWait();
+                }
+            }
+            catch(NumberFormatException e){
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Error Dialog");
+                a.setHeaderText("Look, an Error Dialog");
+                a.setContentText("WRONG INPUT");
+                a.showAndWait();
+                e.printStackTrace();
+            }
+
+        }
+        else{
+            System.out.println("no input");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error Dialog");
+            alert.setHeaderText("Look, an Error Dialog");
+            alert.setContentText("NO INPUT");
+            alert.showAndWait();
+        }
+
+        return id;
+    }
+
+    public int getRGB( Color col) {
+        int r = ((int) Color.RED.getRed()*255);
+        int g = ((int) Color.RED.getGreen() * 255);
+        int b = ((int) Color.RED.getBlue() * 255);
+        return (r << 16) + (g << 8) + b;
     }
 
     public void colors1() throws IOException {
@@ -83,23 +192,23 @@ public class Controller implements Serializable {
         saveAsPng();
     }
 
-    public void colors2() throws IOException {
+    public void colors2(int id) throws IOException {
         drawAndBuild();
-        q.buildTreeC();
-        drawSplitColor(d.rootNode);
+        q.buildTreeC(id);
+        drawSplitColor(d.rootNode, id);
         saveAsPng();
     }
 
-    private void drawAndBuild() throws IOException {
+    private Image drawAndBuild() throws IOException {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         File bmpFile = new File("image.bmp");
         c.bf = ImageIO.read(bmpFile);
         convertToFxImage(c.bf);
         gc.drawImage(convertToFxImage(c.bf), 0 , 0);
-        PixelObject o=new PixelObject(0, 0, 0);
-        ArrayList<PixelObject> arr = PixelObject.output(ColorReader.colors(c.bf), c.bf.getWidth(), c.bf.getHeight());
-        System.out.println(arr.size());
+        //PixelObject o=new PixelObject(0, 0, 0);
+        //PixelObject.output(ColorReader.colors(c.bf), c.bf.getWidth(), c.bf.getHeight());
         d.pic=c.bf;
+        return convertToFxImage(c.bf);
     }
 
 
@@ -117,46 +226,66 @@ public class Controller implements Serializable {
 
 
     public void tryRhomb(ActionEvent event){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        add();
-        MeshTriangle mesh = new MeshTriangle(d);
-        d.height=Integer.parseInt(inputHeight.getText());
-        d.width=Integer.parseInt(inputWidth.getText());
-        d.x0 = Integer.parseInt(inputField1.getText());
-        d.y0 = Integer.parseInt(inputField2.getText());
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setStroke(Color.HOTPINK);
-        gc.setLineWidth(4);
-        gc.strokeLine(20, 20, 20+(d.width/2), 20);
-        gc.strokeLine(20+(d.width/2), 20, 20+d.width, 20+d.height);
-        gc.strokeLine(20+d.width, 20+d.height, 20+(d.width/2), 20+d.height);
-        gc.strokeLine(20+(d.width/2), 20+d.height, 20, 20);
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(1);
-        mesh.generateMesh();
-        draw();
+        try{
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            add();
+            MeshTriangle mesh = new MeshTriangle(d);
+            d.height=Integer.parseInt(inputHeight.getText());
+            d.width=Integer.parseInt(inputWidth.getText());
+            d.x0 = Integer.parseInt(inputField1.getText());
+            d.y0 = Integer.parseInt(inputField2.getText());
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            gc.setStroke(Color.HOTPINK);
+            gc.setLineWidth(4);
+            gc.strokeLine(20, 20, 20+(d.width/2), 20);
+            gc.strokeLine(20+(d.width/2), 20, 20+d.width, 20+d.height);
+            gc.strokeLine(20+d.width, 20+d.height, 20+(d.width/2), 20+d.height);
+            gc.strokeLine(20+(d.width/2), 20+d.height, 20, 20);
+            gc.setStroke(Color.GRAY);
+            gc.setLineWidth(1);
+            mesh.generateMesh();
+            draw();
+        }
+        catch(NumberFormatException e){
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Error Dialog");
+            a.setHeaderText("Look, an Error Dialog");
+            a.setContentText("you have to fill in the blanks");
+            a.showAndWait();
+            e.printStackTrace();
+        }
     }
 
 
     public void tryTrapeze(ActionEvent event){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        add();
-        MeshTriangle mesh = new MeshTriangle(d);
-        d.height=Integer.parseInt(inputHeight.getText());
-        d.width=Integer.parseInt(inputWidth.getText());
-        d.x0 = Integer.parseInt(inputField1.getText());
-        d.y0 = Integer.parseInt(inputField2.getText());
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setStroke(Color.HOTPINK);
-        gc.setLineWidth(4);
-        gc.strokeLine(20+(d.width/5), 20, 20+(4*(d.width/5)), 20);
-        gc.strokeLine(20+(4*(d.width/5)), 20, 20+d.width, 20+d.height);
-        gc.strokeLine(20+d.width, 20+d.height, 20, 20+d.height);
-        gc.strokeLine(20, 20+d.height, 20+(d.width/5), 20);
-        gc.setStroke(Color.GRAY);
-        gc.setLineWidth(1);
-        mesh.generateMesh();
-        draw();
+        try {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            add();
+            MeshTriangle mesh = new MeshTriangle(d);
+            d.height = Integer.parseInt(inputHeight.getText());
+            d.width = Integer.parseInt(inputWidth.getText());
+            d.x0 = Integer.parseInt(inputField1.getText());
+            d.y0 = Integer.parseInt(inputField2.getText());
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            gc.setStroke(Color.HOTPINK);
+            gc.setLineWidth(4);
+            gc.strokeLine(20+(d.width/5), 20, 20+(4*(d.width/5)), 20);
+            gc.strokeLine(20+(4*(d.width/5)), 20, 20+d.width, 20+d.height);
+            gc.strokeLine(20+d.width, 20+d.height, 20, 20+d.height);
+            gc.strokeLine(20, 20+d.height, 20+(d.width/5), 20);
+            gc.setStroke(Color.GRAY);
+            gc.setLineWidth(1);
+            mesh.generateMesh();
+            draw();
+        }
+        catch(NumberFormatException e){
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Error Dialog");
+            a.setHeaderText("Look, an Error Dialog");
+            a.setContentText("you have to fill in the blanks");
+            a.showAndWait();
+            e.printStackTrace();
+        }
     }
 
     private static Image convertToFxImage(BufferedImage image) {
@@ -175,44 +304,51 @@ public class Controller implements Serializable {
 
 
     public void setPictureButton(){
+        clean();
         GraphicsContext gc = canvas.getGraphicsContext2D();
         add();
         try {
             d.pic = ImageIO.read(new File("bg.jpg"));
+            gc.drawImage(convertToFxImage(d.pic), 0, 0);
+            q.buildTree();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(":)");
+            alert.setHeaderText("CHOOSE OPTION");
+            alert.setContentText("Do you want to mesh it with...?");
+
+            ButtonType buttonTypeOne = new ButtonType("RECTANGLES");
+            ButtonType buttonTypeTwo = new ButtonType("TRIANGLES");
+            alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonTypeOne){
+                gc.drawImage(convertToFxImage(d.pic), 0 , 0);
+                drawSplit(d.rootNode);
+            } else if (result.get() == buttonTypeTwo) {
+                gc.drawImage(convertToFxImage(d.pic), 0 , 0);
+                drawSplitT(d.rootNode);
+            }
         } catch (IOException e) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Error Dialog");
+            a.setHeaderText("Look, an Error Dialog");
+            a.setContentText("CANNOT IMPORT - ERROR LOADING PICTURE");
+            a.showAndWait();
             e.printStackTrace();
         }
-        gc.drawImage(convertToFxImage(d.pic), 0, 0);
-        q.buildTree();
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(":)");
-        alert.setHeaderText("CHOOSE OPTION");
-        alert.setContentText("Do you want to mesh it with...?");
 
-        ButtonType buttonTypeOne = new ButtonType("RECTANGLES");
-        ButtonType buttonTypeTwo = new ButtonType("TRIANGLES");
-        alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == buttonTypeOne){
-            gc.drawImage(convertToFxImage(d.pic), 0 , 0);
-            drawSplit(d.rootNode);
-        } else if (result.get() == buttonTypeTwo) {
-            gc.drawImage(convertToFxImage(d.pic), 0 , 0);
-            drawSplitT(d.rootNode);
-        }
     }
 
-    void drawSplitColor(Node root){
+    void drawSplitColor(Node root, int id){
         getGC(root);
-        if(root.n1 != null && (q.checkk(root.n1.p)))
-            drawSplitColor(root.n1);
-        if(root.n2 != null && (q.checkk(root.n2.p)))
-            drawSplitColor(root.n2);
-        if(root.n3 != null && (q.checkk(root.n3.p)))
-            drawSplitColor(root.n3);
-        if(root.n4 != null && (q.checkk(root.n4.p)))
-            drawSplitColor(root.n4);
+        if(root.n1 != null && (q.checkk(root.n1.p, id)))
+            drawSplitColor(root.n1, id);
+        if(root.n2 != null && (q.checkk(root.n2.p, id)))
+            drawSplitColor(root.n2, id);
+        if(root.n3 != null && (q.checkk(root.n3.p, id)))
+            drawSplitColor(root.n3, id);
+        if(root.n4 != null && (q.checkk(root.n4.p, id)))
+            drawSplitColor(root.n4, id);
     }
 
     void drawSplitColorMeshAll(Node root) {
@@ -300,32 +436,52 @@ public class Controller implements Serializable {
     }
 
     public void clickSquare(ActionEvent event){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        add();
-        Mesh mesh=new Mesh(d);
-        d.height=Integer.parseInt(inputHeight.getText());
-        d.width=Integer.parseInt(inputWidth.getText());
-        d.x0 = Integer.parseInt(inputField1.getText());
-        d.y0 = Integer.parseInt(inputField2.getText());
-        mesh.generateMesh();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        d();
-        draw();
+        try {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            add();
+            Mesh mesh=new Mesh(d);
+            d.height = Integer.parseInt(inputHeight.getText());
+            d.width = Integer.parseInt(inputWidth.getText());
+            d.x0 = Integer.parseInt(inputField1.getText());
+            d.y0 = Integer.parseInt(inputField2.getText());
+            mesh.generateMesh();
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            d();
+            draw();
+        }
+        catch(NumberFormatException e){
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Error Dialog");
+            a.setHeaderText("Look, an Error Dialog");
+            a.setContentText("you have to fill in the blanks");
+            a.showAndWait();
+            e.printStackTrace();
+        }
     }
 
 
     public void clickTriangle(ActionEvent event) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        add();
-        MeshTriangle mesh = new MeshTriangle(d);
-        d.height = Integer.parseInt(inputHeight.getText());
-        d.width = Integer.parseInt(inputWidth.getText());
-        d.x0 = Integer.parseInt(inputField1.getText());
-        d.y0 = Integer.parseInt(inputField2.getText());
-        mesh.generateMesh();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        d();
-        draw();
+        try {
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            add();
+            MeshTriangle mesh = new MeshTriangle(d);
+            d.height = Integer.parseInt(inputHeight.getText());
+            d.width = Integer.parseInt(inputWidth.getText());
+            d.x0 = Integer.parseInt(inputField1.getText());
+            d.y0 = Integer.parseInt(inputField2.getText());
+            mesh.generateMesh();
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            d();
+            draw();
+        }
+        catch(NumberFormatException e){
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setTitle("Error Dialog");
+            a.setHeaderText("Look, an Error Dialog");
+            a.setContentText("you have to fill in the blanks");
+            a.showAndWait();
+            e.printStackTrace();
+        }
     }
 
     public void clickRefresh(ActionEvent event){

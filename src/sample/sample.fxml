@@ -31,8 +31,8 @@
             <Button fx:id="refreshButton" layoutX="596.0" layoutY="109.0" mnemonicParsing="false" onAction="#clickRefresh" prefHeight="25.0" prefWidth="89.0" text="REFRESH" />
             <Button fx:id="rhombButton" layoutX="14.0" layoutY="192.0" mnemonicParsing="false" onAction="#tryRhomb" prefHeight="51.0" prefWidth="89.0" text="TRY RHOMB" />
             <Button fx:id="trapezeButton" layoutX="14.0" layoutY="263.0" mnemonicParsing="false" onAction="#tryTrapeze" prefHeight="51.0" prefWidth="89.0" text="TRY TRAPEZE" />
-            <Button fx:id="pictureButton" layoutX="14.0" layoutY="334.0" mnemonicParsing="false" onAction="#setPictureButton" prefHeight="51.0" prefWidth="89.0" text="PICTURE" />
-            <Button fx:id="colorsButton" layoutX="14.0" layoutY="404.0" mnemonicParsing="false" onAction="#clickColors" prefHeight="51.0" prefWidth="89.0" text="COLORS" />
+            <Button fx:id="pictureButton" layoutX="14.0" layoutY="334.0" mnemonicParsing="false" onAction="#setPictureButton" prefHeight="51.0" prefWidth="89.0" text="MESH &#10;PICTURE&#10;" textAlignment="CENTER" />
+            <Button fx:id="colorsButton" layoutX="14.0" layoutY="404.0" mnemonicParsing="false" onAction="#clickColors" prefHeight="51.0" prefWidth="89.0" text="MESH&#10;COLORS" textAlignment="CENTER" />
          </children>
       </Pane>
    </children>

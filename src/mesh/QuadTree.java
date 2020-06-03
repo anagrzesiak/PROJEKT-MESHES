@@ -1,26 +1,26 @@
 package mesh;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class QuadTree {
     Data d;
-    Random direction;
-    ColorReader cr = new ColorReader();
 
     public QuadTree(Data d) {
         this.d = d;
-        direction = new Random(System.currentTimeMillis());
     }
 
-    public boolean checkk(Part p) {
+
+    public boolean checkk(Part p, int identifier) {
         int check=0;
         PixelObject[][] arr = new PixelObject[d.pic.getWidth()][d.pic.getHeight()];
         for (int i = p.origin.x; i < (p.origin.x + p.width); i++) {
             for (int j = p.origin.y; j < (p.origin.y + p.height); j++) {
                 //Color current = new Color(d.pic.getRGB(i, j));
                 arr[i][j] = new PixelObject(i, j, d.pic.getRGB(i, j));
-                if(arr[i][j].identifier == 8320877){
+                if(arr[i][j].id == identifier){
                     check++;
                 }
             }
@@ -28,22 +28,22 @@ public class QuadTree {
         return (check>0);
     }
 
-    public boolean checkMeshAll(Part p) {
-        /*int check=0;
-        int check2=2;
-        PixelObject[][] arr = new PixelObject[d.pic.getWidth()][d.pic.getHeight()];
+    public void getIDs(Part p){
+        ArrayList<Integer> list = new ArrayList<Integer>();
         for (int i = p.origin.x; i < (p.origin.x + p.width); i++) {
             for (int j = p.origin.y; j < (p.origin.y + p.height); j++) {
-                //Color current = new Color(d.pic.getRGB(i, j));
-                arr[i][j] = new PixelObject(i, j, d.pic.getRGB(i, j));
-                if(arr[i][j].identifier == 8320877){
-                    check++;
-                }
-                else{
-                    check2++;
+                if(!(list.contains(-(d.pic.getRGB(i, j))/2))){
+                    list.add(-(d.pic.getRGB(i, j))/2);
                 }
             }
-        }*/
+        }
+        System.out.println(list.size());
+        System.out.println(list);
+    }
+
+
+    public boolean checkMeshAll(Part p) {
+       // getIDs(p);
         return true;
     }
 
@@ -77,12 +77,9 @@ public class QuadTree {
         return what;
     }
 
-    public Boolean checkInRange(Part p, Particle pa){
-        return ((pa.x > p.origin.x) && (pa.x < p.origin.x+p.width) && (pa.y > p.origin.y) && (pa.y < p.origin.y+p.height));
-    }
 
-    void splitColor(Node root) {
-        if (checkk(root.p)) {
+    void splitColor(Node root, int id) {
+        if (checkk(root.p, id)) {
             if (root.p.width % 2 != 0) {
                 root.p.width = root.p.width - 1;
             }
@@ -100,18 +97,18 @@ public class QuadTree {
                 root.n2 = n2;
                 root.n3 = n3;
                 root.n4 = n4;
-                splitColor(n1);
-                splitColor(n2);
-                splitColor(n3);
-                splitColor(n4);
-                if (checkk(n1.p))
-                    splitColor(n1);
-                if (checkk(n2.p))
-                    splitColor(n2);
-                if (checkk(n3.p))
-                    splitColor(n3);
-                if (checkk(n4.p))
-                    splitColor(n4);
+                splitColor(n1, id);
+                splitColor(n2, id);
+                splitColor(n3, id);
+                splitColor(n4, id);
+                if (checkk(n1.p, id))
+                    splitColor(n1, id);
+                if (checkk(n2.p, id))
+                    splitColor(n2, id);
+                if (checkk(n3.p, id))
+                    splitColor(n3, id);
+                if (checkk(n4.p, id))
+                    splitColor(n4, id);
             }
         }
     }
@@ -231,12 +228,12 @@ public class QuadTree {
         split(d.rootNode);
     }
 
-    public void buildTreeC() {
+    public void buildTreeC(int id) {
         int width = d.pic.getWidth();
         int height = d.pic.getHeight();
         Part mainPart = new Part(new Point(0, 0), width, height);
         d.rootNode = new Node(mainPart, null, null, null, null);
-        splitColor(d.rootNode);
+        splitColor(d.rootNode, id);
     }
 
     public void buildTreeCMeshAll() {
@@ -256,12 +253,6 @@ public class QuadTree {
         split2(d.rootNode);
     }
 
-    public void generateParticles(int amount){
-        Random rand = new Random(System.currentTimeMillis());
-        for(int i = 0; i < amount; i++){
-            d.particles.add(new Particle(rand.nextInt(d.width), rand.nextInt(d.height)));
-        }
-    }
 }
 
 
